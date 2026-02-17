@@ -58,6 +58,15 @@ In the sidebar, provide:
 
 The app will attempt to resolve those paths against the cache root.
 
+
+## Deployment troubleshooting
+
+If you still see an old error after updating code (for example, `No module named 'plotly'` or `No module named 'abc_atlas_access'`), your runtime may still be serving an older commit.
+
+- Confirm deployed revision: `git rev-parse --short HEAD`
+- Restart the Streamlit process/service after pulling latest changes
+- Recreate the virtual environment dependencies if needed
+
 ## Scalability notes
 
 - Uses `streamlit` caching for metadata, expression subsets, and manifest lookup.
