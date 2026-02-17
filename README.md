@@ -7,6 +7,7 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 ## App features
 
 - Supports **Allen ABC cache-based loading** via `abc_atlas_access` (recommended for Allen-hosted data workflows).
+- Supports direct local CSV/Parquet loading as a fallback.
 - Loads metadata (cell id, region, class, CCF xyz) and expression (wide or long format).
 - Filters by region, cell class, and per-gene thresholds.
 - Visualizes filtered cells in 2D and 3D CCF coordinates (with Streamlit fallback charts when Plotly is unavailable).
