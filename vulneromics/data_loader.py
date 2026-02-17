@@ -20,6 +20,10 @@ class DataSchemaError(ValueError):
     """Raised when expected columns are missing from input data."""
 
 
+class AbcAtlasAccessUnavailableError(ImportError):
+    """Raised when abc_atlas_access is not installed."""
+
+
 def _read_table(path: Path, columns: list[str] | None = None) -> pd.DataFrame:
     suffix = path.suffix.lower()
     if suffix == ".csv":
@@ -51,13 +55,16 @@ def _pick_coord_columns(columns: list[str]) -> tuple[str, str, str]:
 
 @st.cache_data(show_spinner=False)
 def get_abc_cache_manifest(cache_dir: str) -> str:
-    """Return a simple string representation of the current Allen ABC manifest.
+    """Return a simple string representation of the current Allen ABC manifest."""
 
-    This initializes `AbcProjectCache` from a local cache directory. If the cache does not
-    exist yet, `abc_atlas_access` can populate it by downloading from Allen-hosted sources.
-    """
-
-    from abc_atlas_access.abc_atlas_cache.abc_project_cache import AbcProjectCache
+    try:
+        from abc_atlas_access.abc_atlas_cache.abc_project_cache import AbcProjectCache
+    except ModuleNotFoundError as exc:
+        raise AbcAtlasAccessUnavailableError(
+            "`abc_atlas_access` is not installed. Install with:\n"
+            "pip install \"abc_atlas_access[notebooks] @ "
+            "git+https://github.com/alleninstitute/abc_atlas_access.git\""
+        ) from exc
 
     abc_cache = AbcProjectCache.from_cache_dir(Path(cache_dir))
     return str(abc_cache.current_manifest)
