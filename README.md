@@ -10,7 +10,7 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 - Supports direct local CSV/Parquet loading as a fallback.
 - Loads metadata (cell id, region, class, CCF xyz) and expression (wide or long format).
 - Filters by region, cell class, and per-gene thresholds.
-- Visualizes filtered cells in 2D and 3D CCF coordinates (with Streamlit fallback charts when Plotly is unavailable).
+- Visualizes filtered cells in 2D and 3D CCF coordinates.
 - Compares grouped mean expression (region/class), including adrenergic/cholinergic receptor panels.
 
 ## Repository structure
@@ -31,9 +31,7 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install streamlit pandas numpy pyarrow abc-atlas-access
-# optional for interactive 3D/bar charts
-pip install plotly
+pip install streamlit pandas numpy pyarrow plotly abc-atlas-access
 streamlit run app.py
 ```
 

@@ -3,24 +3,10 @@
 from __future__ import annotations
 
 import pandas as pd
-
-
-class PlotBackendUnavailableError(ImportError):
-    """Raised when an optional plotting backend is unavailable."""
-
-
-def _px():
-    try:
-        import plotly.express as px
-    except ModuleNotFoundError as exc:
-        raise PlotBackendUnavailableError(
-            "plotly is not installed. Install with `pip install plotly` for interactive Plotly charts."
-        ) from exc
-    return px
+import plotly.express as px
 
 
 def scatter_2d(df: pd.DataFrame, color_by: str = "cell_class"):
-    px = _px()
     return px.scatter(
         df,
         x="x",
@@ -33,7 +19,6 @@ def scatter_2d(df: pd.DataFrame, color_by: str = "cell_class"):
 
 
 def scatter_3d(df: pd.DataFrame, color_by: str = "cell_class"):
-    px = _px()
     return px.scatter_3d(
         df,
         x="x",
@@ -47,7 +32,6 @@ def scatter_3d(df: pd.DataFrame, color_by: str = "cell_class"):
 
 
 def gene_comparison_bar(summary_df: pd.DataFrame, group_col: str):
-    px = _px()
     long_df = summary_df.melt(id_vars=[group_col], var_name="gene", value_name="mean_expression")
     return px.bar(
         long_df,
