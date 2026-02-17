@@ -24,60 +24,36 @@ st.title("vulneromics · Allen MERFISH explorer")
 
 st.markdown(
     """
-This app supports two data access modes:
-- **Allen ABC cache mode** (recommended): use `abc_atlas_access` cache dir + file paths from manifest-backed downloads
-- **Local files mode**: point directly to CSV/Parquet files
+This app is configured for **Allen ABC Atlas access only** via `abc_atlas_access` cache workflows.
 """
 )
 
 with st.sidebar:
-    st.header("Data source")
-    load_mode = st.radio("Load mode", ["Allen ABC cache", "Local files"], horizontal=False)
+    st.header("Allen ABC data source")
+    cache_dir = st.text_input(
+        "ABC cache directory",
+        value="../../data/abc_atlas",
+        help="Example: AbcProjectCache.from_cache_dir(Path('../../data/abc_atlas')).",
+    )
 
-    if load_mode == "Allen ABC cache":
-        cache_dir = st.text_input(
-            "ABC cache directory",
-            value="../../data/abc_atlas",
-            help="Example from Allen docs: AbcProjectCache.from_cache_dir(Path('../../data/abc_atlas')).",
-        )
-        show_manifest = st.checkbox("Show abc_cache.current_manifest", value=True)
-        if show_manifest:
-            try:
-                st.code(get_abc_cache_manifest(cache_dir))
-            except AbcAtlasAccessUnavailableError as exc:
-                st.warning(str(exc))
-            except Exception as exc:  # noqa: BLE001
-                st.warning(f"Unable to read current manifest from cache: {exc}")
-
-        metadata_rel = st.text_input(
-            "Metadata file path (relative to cache dir or absolute)",
-            value="metadata/WMB-taxonomy/cluster_to_cluster_annotation_membership_pivoted.csv",
-        )
-        expression_rel = st.text_input(
-            "Expression file path (relative to cache dir or absolute)",
-            value="expression/merfish_expression.parquet",
-        )
-
+    show_manifest = st.checkbox("Show abc_cache.current_manifest", value=True)
+    if show_manifest:
         try:
-            metadata_path = resolve_abc_file_path(cache_dir, metadata_rel)
-        except FileNotFoundError:
-            metadata_path = metadata_rel
+            st.code(get_abc_cache_manifest(cache_dir))
+        except AbcAtlasAccessUnavailableError as exc:
+            st.error(str(exc))
+            st.stop()
+        except Exception as exc:  # noqa: BLE001
+            st.warning(f"Unable to read current manifest from cache: {exc}")
 
-        try:
-            expression_path = resolve_abc_file_path(cache_dir, expression_rel) if expression_rel else ""
-        except FileNotFoundError:
-            expression_path = expression_rel
-    else:
-        metadata_path = st.text_input(
-            "Metadata file (CSV/Parquet)",
-            value="data/cell_metadata.parquet",
-            help="Should include cell id, region, class, and xyz CCF coordinates.",
-        )
-        expression_path = st.text_input(
-            "Expression file (CSV/Parquet)",
-            value="data/expression.parquet",
-            help="Either long format: cell_id,gene,expression or wide format: one column per gene.",
-        )
+    metadata_rel = st.text_input(
+        "Metadata file path (relative to cache dir or absolute)",
+        value="metadata/WMB-taxonomy/cluster_to_cluster_annotation_membership_pivoted.csv",
+    )
+    expression_rel = st.text_input(
+        "Expression file path (relative to cache dir or absolute)",
+        value="expression/merfish_expression.parquet",
+    )
 
     st.header("Gene panel")
     default_genes = st.multiselect(
@@ -88,6 +64,19 @@ with st.sidebar:
     extra_genes_raw = st.text_input("Additional genes (comma-separated)", "Arc,Gne,Rab15")
     extra_genes = [g.strip() for g in extra_genes_raw.split(",") if g.strip()]
     selected_genes = list(dict.fromkeys([*default_genes, *extra_genes]))
+
+try:
+    metadata_path = resolve_abc_file_path(cache_dir, metadata_rel)
+except FileNotFoundError as exc:
+    st.error(f"Metadata path could not be resolved from ABC cache: {exc}")
+    st.stop()
+
+expression_path = ""
+if expression_rel:
+    try:
+        expression_path = resolve_abc_file_path(cache_dir, expression_rel)
+    except FileNotFoundError as exc:
+        st.warning(f"Expression path could not be resolved from ABC cache: {exc}")
 
 try:
     metadata = load_metadata(metadata_path)

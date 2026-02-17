@@ -40,7 +40,7 @@ streamlit run app.py
 
 ## Allen ABC cache usage
 
-The app's **Allen ABC cache** mode is designed around the standard pattern:
+The app uses **Allen ABC cache mode only**, designed around the standard pattern:
 
 ```python
 from pathlib import Path
