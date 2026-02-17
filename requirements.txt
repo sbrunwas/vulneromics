@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+pyarrow
+# Optional but recommended for interactive 3D and grouped bar charts
+plotly
+# Allen ABC data access (install from source per Allen docs)
+abc_atlas_access[notebooks] @ git+https://github.com/alleninstitute/abc_atlas_access.git
