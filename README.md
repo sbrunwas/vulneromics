@@ -31,8 +31,7 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install streamlit pandas numpy pyarrow
-pip install "abc_atlas_access[notebooks] @ git+https://github.com/alleninstitute/abc_atlas_access.git"
+pip install streamlit pandas numpy pyarrow abc-atlas-access
 # optional for interactive 3D/bar charts
 pip install plotly
 streamlit run app.py

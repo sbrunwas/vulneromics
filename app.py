@@ -4,7 +4,6 @@ import streamlit as st
 
 from vulneromics.config import DEFAULT_RECEPTOR_PANEL
 from vulneromics.data_loader import (
-    AbcAtlasAccessUnavailableError,
     DataSchemaError,
     get_abc_cache_manifest,
     load_expression_subset,
@@ -44,8 +43,6 @@ with st.sidebar:
         if show_manifest:
             try:
                 st.code(get_abc_cache_manifest(cache_dir))
-            except AbcAtlasAccessUnavailableError as exc:
-                st.warning(str(exc))
             except Exception as exc:  # noqa: BLE001
                 st.warning(f"Unable to read current manifest from cache: {exc}")
 
