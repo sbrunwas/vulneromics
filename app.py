@@ -11,7 +11,12 @@ from vulneromics.data_loader import (
     resolve_abc_file_path,
 )
 from vulneromics.filters import filter_cells, summarize_gene_expression
-from vulneromics.plotting import gene_comparison_bar, scatter_2d, scatter_3d
+from vulneromics.plotting import (
+    PlotBackendUnavailableError,
+    gene_comparison_bar,
+    scatter_2d,
+    scatter_3d,
+)
 
 st.set_page_config(page_title="vulneromics MERFISH explorer", layout="wide")
 st.title("vulneromics · Allen MERFISH explorer")
@@ -139,12 +144,17 @@ color_by = st.selectbox("Color points by", ["cell_class", "region"], index=0)
 plot_tab, compare_tab, table_tab = st.tabs(["Spatial plots", "Gene comparison", "Data preview"])
 with plot_tab:
     c1, c2 = st.columns(2)
-    c1.plotly_chart(scatter_2d(filtered, color_by=color_by), use_container_width=True)
-    c2.plotly_chart(
-        scatter_3d(filtered.sample(min(len(filtered), 30_000)), color_by=color_by),
-        use_container_width=True,
-    )
-    st.caption("3D plot is sampled to max 30k cells for responsiveness.")
+    sampled = filtered.sample(min(len(filtered), 30_000))
+
+    try:
+        c1.plotly_chart(scatter_2d(filtered, color_by=color_by), use_container_width=True)
+        c2.plotly_chart(scatter_3d(sampled, color_by=color_by), use_container_width=True)
+        st.caption("3D plot is sampled to max 30k cells for responsiveness.")
+    except PlotBackendUnavailableError as exc:
+        st.warning(f"{exc} Falling back to native Streamlit charts.")
+        c1.scatter_chart(filtered, x="x", y="y", color=color_by, size=None)
+        c2.scatter_chart(sampled, x="x", y="z", color=color_by, size=None)
+        st.caption("Fallback view: 2D projections (x,y) and (x,z). Install plotly for interactive 3D.")
 
 with compare_tab:
     if selected_genes:
@@ -153,7 +163,10 @@ with compare_tab:
         if summary.empty:
             st.info("No selected genes available in current dataset.")
         else:
-            st.plotly_chart(gene_comparison_bar(summary, group_col), use_container_width=True)
+            try:
+                st.plotly_chart(gene_comparison_bar(summary, group_col), use_container_width=True)
+            except PlotBackendUnavailableError as exc:
+                st.warning(f"{exc} Showing table-only fallback.")
             st.dataframe(summary, use_container_width=True)
     else:
         st.info("Select at least one gene to compare expression.")

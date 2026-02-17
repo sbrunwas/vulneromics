@@ -1,6 +1,6 @@
 # vulneromics
 
-`vulneromics` integrates open datasets—from MERFISH single-cell maps to IBL Neuropixels recordings—to identify molecular and state-dependent signatures of vulnerability in the mouse default mode network.
+vulneromics integrates open datasets—from MERFISH single-cell maps to IBL Neuropixels recordings—to identify molecular and state-dependent signatures of vulnerability in the mouse default mode network, linking gene expression, arousal modulation, and network resilience.
 
 This repository includes a Streamlit dashboard for exploring Allen Institute MERFISH mouse brain data in CCF space.
 
@@ -10,7 +10,7 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 - Supports direct local CSV/Parquet loading as a fallback.
 - Loads metadata (cell id, region, class, CCF xyz) and expression (wide or long format).
 - Filters by region, cell class, and per-gene thresholds.
-- Visualizes filtered cells in 2D and 3D CCF coordinates.
+- Visualizes filtered cells in 2D and 3D CCF coordinates (with Streamlit fallback charts when Plotly is unavailable).
 - Compares grouped mean expression (region/class), including adrenergic/cholinergic receptor panels.
 
 ## Repository structure
@@ -31,7 +31,9 @@ This repository includes a Streamlit dashboard for exploring Allen Institute MER
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install streamlit pandas numpy pyarrow plotly abc-atlas-access
+pip install streamlit pandas numpy pyarrow abc-atlas-access
+# optional for interactive 3D/bar charts
+pip install plotly
 streamlit run app.py
 ```
 
